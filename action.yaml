@@ -178,21 +178,21 @@ runs:
     #     mkdir -p $new_path
     #     cp $GITHUB_WORKSPACE/${{ inputs.app_volume_ui }}/* "$new_path"
 
-    # - name: Copy Deployment Config
-    #   if: ${{ inputs.infrastructure_only == 'false' }}
-    #   shell: bash
-    #   env:
-    #     GITHUB_ACTION_PATH: ${{ github.action_path }}
-    #     APP_SUBDIR: gha-deployment
-    #   run: |
-    #     app_path=$GITHUB_WORKSPACE/$APP_SUBDIR
+    - name: Copy Deployment Config
+      if: ${{ inputs.infrastructure_only == 'false' }}
+      shell: bash
+      env:
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
+        APP_SUBDIR: gha-deployment
+      run: |
+        app_path=$GITHUB_WORKSPACE/$APP_SUBDIR
 
-    #     echo "Copying app Repo"
-    #     mkdir -p "$app_path"
-    #     cp -r  $GITHUB_ACTION_PATH/. "$app_path"
+        echo "Copying app Repo"
+        mkdir -p "$app_path"
+        cp -r  $GITHUB_ACTION_PATH/. "$app_path"
 
-    #     echo "removing operations dir"
-    #     rm -rf $app_path/operations
+        echo "removing operations dir"
+        rm -rf $app_path/operations
 
     - name: Deploy with Bitovi Commons
       id: deploy
