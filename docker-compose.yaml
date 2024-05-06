@@ -1,0 +1,24 @@
+version: "3.0"
+services:
+
+  ui:
+    image: ghcr.io/open-webui/open-webui:main
+    restart: always
+    ports:
+      - 3011:8080
+    volumes:
+      - ./open-webui:/app/backend/data
+    environment:
+      # - "ENABLE_SIGNUP=false"
+      - "OLLAMA_BASE_URL=http://ollama:11434"
+
+
+  # ollama which shoul dhave a start command of `ollama run llama3:8b`
+  ollama:
+    image: ollama/ollama
+    restart: always
+    ports:
+      - 11434:11434
+    volumes:
+      - ./ollama:/root/.ollama
+    # entrypoint: ollama run llama3:8b

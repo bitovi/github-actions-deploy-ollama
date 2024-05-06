@@ -1,0 +1,269 @@
+name: 'Deploy Ollama and Open WebUI'
+description: 'Deploy Ollama with a WebUI frontend to an EC2 instance.'
+
+inputs:
+  checkout:
+    description: 'Whether to checkout the repo. Set to true if your deployment relies on files in the repository.'
+    required: true
+    default: 'true'
+
+  # AWS Configuration
+  aws_access_key_id:
+    description: 'AWS access key ID.'
+    required: true
+  aws_secret_access_key:
+    description: 'AWS secret access key.'
+    required: true
+  aws_session_token:
+    description: 'AWS session token.'
+    required: false
+  aws_default_region:
+    description: 'AWS region to deploy resources.'
+    required: true
+  aws_resource_identifier:
+    description: 'Unique identifier for AWS resource naming to avoid conflicts.'
+    required: true
+  aws_extra_tags:
+    description: 'Additional tags to apply to all AWS resources created.'
+    required: false
+
+  # ENV files
+  env_aws_secret:
+    description: 'AWS secret environment variable for the application.'
+    required: true
+  env_repo:
+    description: 'Repository environment variable for deployment configuration.'
+    required: false
+  env_ghs:
+    description: 'GitHub secret for deployment actions.'
+    required: false
+  env_ghv:
+    description: 'GitHub variable for additional configuration.'
+    required: false
+
+  # EC2 Instance config
+  aws_ec2_instance_type:
+    description: 'Type of AWS EC2 instance to deploy.'
+    required: true
+  aws_ec2_instance_profile:
+    description: 'IAM profile to attach to the EC2 instance.'
+    required: false
+  aws_ec2_create_keypair_sm:
+    description: 'Create a key pair using AWS Secrets Manager.'
+    required: false
+  aws_ec2_instance_vol_size:
+    description: 'Volume size for the EC2 instance in GB.'
+    required: true
+  aws_ec2_additional_tags:
+    description: 'Additional tags for the EC2 instance.'
+    required: false
+  aws_ec2_ami_filter:
+    description: 'Filter to select the AMI for the EC2 instance.'
+    required: true
+  infrastructure_only:
+    description: 'If set to true, only the infrastructure is deployed without deploying the application.'
+    required: false
+    default: 'false'
+
+  # app specific config
+  # app_volume_ui:
+  #   description: 'Volume mapping for the UI service.'
+  #   required: false
+  #   default: './open-webui:/app/backend/data'
+  # app_volume_ollama:
+  #   description: 'Volume mapping for the Ollama service.'
+  #   required: false
+  #   default: './ollama:/root/.ollama'
+
+  # Stack Management
+  tf_stack_destroy:
+    description: 'Whether to destroy the Terraform stack on completion.'
+    required: false
+    default: 'false'
+  tf_state_file_name:
+    description: 'The name of the Terraform state file.'
+    required: true
+  tf_state_file_name_append:
+    description: 'Append a suffix to the state file name to allow unique state management.'
+    required: false
+  tf_state_bucket:
+    description: 'The S3 bucket name where the Terraform state file will be stored.'
+    required: true
+  tf_state_bucket_destroy:
+    description: 'Whether to destroy the state bucket on stack completion.'
+    required: false
+
+  # Domains
+  aws_domain_name:
+    description: 'The domain name to be used with this deployment.'
+    required: true
+  aws_sub_domain:
+    description: 'Subdomain to deploy the application.'
+    required: false
+  aws_root_domain:
+    description: 'Root domain under which the subdomain will be created.'
+    required: true
+  aws_cert_arn:
+    description: 'ARN of an existing AWS Certificate Manager certificate to use.'
+    required: false
+  aws_create_root_cert:
+    description: 'Whether to create a new certificate for the root domain.'
+    required: false
+  aws_create_sub_cert:
+    description: 'Whether to create a new certificate for the subdomain.'
+    required: false
+  aws_no_cert:
+    description: 'Set to true to disable SSL certificate setup.'
+    required: false
+    default: 'false'
+
+  # VPC Inputs
+  aws_vpc_create:
+    description: 'Whether to create a new VPC for this deployment.'
+    required: false
+    default: 'false'
+  aws_vpc_name:
+    description: 'The name of the VPC to be created or used.'
+    required: false
+  aws_vpc_cidr_block:
+    description: 'The CIDR block for the VPC.'
+    required: true
+  aws_vpc_public_subnets:
+    description: 'List of public subnet CIDRs for the VPC.'
+    required: true
+  aws_vpc_private_subnets:
+    description: 'List of private subnet CIDRs for the VPC.'
+    required: true
+  aws_vpc_availability_zones:
+    description: 'Availability zones to use within the VPC.'
+    required: true
+  aws_vpc_id:
+    description: 'The ID of an existing VPC where resources will be deployed.'
+    required: false
+  aws_vpc_subnet_id:
+    description: 'The ID of an existing subnet within the VPC to use.'
+    required: false
+  aws_vpc_additional_tags:
+    description: 'Additional tags for the VPC.'
+    required: false
+
+outputs:
+  vm_url:
+    description: 'The URL of the generated app'
+    value: ${{ steps.deploy.outputs.vm_url }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout
+      if: ${{ inputs.checkout == 'true' }}
+      uses: actions/checkout@v2
+
+    - name: Invert boolean Variable
+      shell: bash
+      id: set-cert
+      if: ${{ inputs.aws_no_cert == 'false' }}
+      run: echo "enable_cert=true" >> $GITHUB_OUTPUT
+
+    # - name: Copy User Files
+    #   if: ${{ inputs.infrastructure_only == 'false' }}
+    #   shell: bash
+    #   env:
+    #     GITHUB_ACTION_PATH: ${{ github.action_path }}
+    #   run: |
+    #     echo "Copying User Files"
+
+    #     new_path=$GITHUB_ACTION_PATH/some-meaningfully-named-directory
+    #     mkdir -p $new_path
+    #     cp $GITHUB_WORKSPACE/${{ inputs.app_volume_ui }}/* "$new_path"
+
+    # - name: Copy Deployment Config
+    #   if: ${{ inputs.infrastructure_only == 'false' }}
+    #   shell: bash
+    #   env:
+    #     GITHUB_ACTION_PATH: ${{ github.action_path }}
+    #     APP_SUBDIR: gha-deployment
+    #   run: |
+    #     app_path=$GITHUB_WORKSPACE/$APP_SUBDIR
+
+    #     echo "Copying app Repo"
+    #     mkdir -p "$app_path"
+    #     cp -r  $GITHUB_ACTION_PATH/. "$app_path"
+
+    #     echo "removing operations dir"
+    #     rm -rf $app_path/operations
+
+    - name: Deploy with Bitovi Commons
+      id: deploy
+      uses: bitovi/github-actions-commons@v0.0.13
+      with:
+        # Current repo vars
+        checkout: false
+        gh_action_repo: ${{ github.action_path }}
+        # gh_action_input_ansible: operations/deployment/ansible
+        ansible_skip: ${{ inputs.infrastructure_only }}
+
+        # AWS
+        aws_access_key_id: ${{ inputs.aws_access_key_id }}
+        aws_secret_access_key: ${{ inputs.aws_secret_access_key }}
+        aws_session_token: ${{ inputs.aws_session_token }}
+        aws_default_region: ${{ inputs.aws_default_region }}
+        aws_resource_identifier: ${{ inputs.aws_resource_identifier }}
+        aws_additional_tags: ${{ inputs.aws_extra_tags }}
+
+        # Docker
+        docker_install: true
+        docker_cloudwatch_enable: true
+        docker_cloudwatch_skip_destroy: true
+        docker_repo_app_directory: 'gha-deployment'
+
+        # EC2
+        aws_ec2_instance_create: true
+        aws_ec2_ami_filter: ${{ inputs.aws_ec2_ami_filter }}
+        aws_ec2_iam_instance_profile: ${{ inputs.aws_ec2_instance_profile }}
+        aws_ec2_instance_type: ${{ inputs.aws_ec2_instance_type }}
+        aws_ec2_instance_public_ip: true
+        aws_ec2_create_keypair_sm: ${{ inputs.aws_ec2_create_keypair_sm }}
+        aws_ec2_instance_root_vol_size: ${{ inputs.aws_ec2_instance_vol_size }}
+        aws_ec2_additional_tags: ${{ inputs.aws_ec2_additional_tags }}
+        aws_ec2_port_list: "3011,11434"
+        
+        # AWS ELB
+        aws_elb_create: true
+        aws_elb_listen_port: "443,3011"
+        aws_elb_app_port: "8080,11434"
+        aws_elb_healthcheck: "TCP:11434"
+
+        # Stack management
+        tf_stack_destroy: ${{ inputs.tf_stack_destroy }}
+        tf_state_file_name: ${{ inputs.tf_state_file_name }}
+        tf_state_file_name_append: ${{ inputs.tf_state_file_name_append }}
+        tf_state_bucket: ${{ inputs.tf_state_bucket }}
+        tf_state_bucket_destroy: ${{ inputs.tf_state_bucket_destroy }}
+        tf_state_bucket_provider: 'aws'
+
+        # AWS Route53 Domains and Certificates
+        aws_r53_enable: true
+        aws_r53_domain_name: ${{ inputs.aws_domain_name }}
+        aws_r53_sub_domain_name: ${{ inputs.aws_sub_domain }}
+        aws_r53_root_domain_deploy: ${{ inputs.aws_root_domain }}
+        aws_r53_enable_cert: ${{ steps.set-cert.outputs.enable_cert }}
+        aws_r53_cert_arn: ${{ inputs.aws_cert_arn }}
+        aws_r53_create_root_cert: ${{ inputs.aws_create_root_cert }}
+        aws_r53_create_sub_cert: ${{ inputs.aws_create_sub_cert }}
+
+        aws_vpc_create: ${{ inputs.aws_vpc_create }}
+        aws_vpc_name: ${{ inputs.aws_vpc_name }}
+        aws_vpc_cidr_block: ${{ inputs.aws_vpc_cidr_block }}
+        aws_vpc_public_subnets: ${{ inputs.aws_vpc_public_subnets }}
+        aws_vpc_private_subnets: ${{ inputs.aws_vpc_private_subnets }}
+        aws_vpc_availability_zones: ${{ inputs.aws_vpc_availability_zones }}
+        aws_vpc_id: ${{ inputs.aws_vpc_id }}
+        aws_vpc_subnet_id: ${{ inputs.aws_vpc_subnet_id }}
+        aws_vpc_additional_tags: ${{ inputs.aws_vpc_additional_tags }}
+
+        # ENV files
+        env_aws_secret: ${{ inputs.env_aws_secret }}
+        env_repo: ${{ inputs.env_repo }}
+        env_ghs: ${{ inputs.env_ghs }}
+        env_ghv: ${{ inputs.env_ghv }}
