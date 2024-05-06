@@ -44,7 +44,8 @@ inputs:
   # EC2 Instance config
   aws_ec2_instance_type:
     description: 'Type of AWS EC2 instance to deploy.'
-    required: true
+    required: false
+    default: 'inf1.xlarge'
   aws_ec2_instance_profile:
     description: 'IAM profile to attach to the EC2 instance.'
     required: false
