@@ -53,8 +53,9 @@ inputs:
     description: 'Create a key pair using AWS Secrets Manager.'
     required: false
   aws_ec2_instance_vol_size:
-    description: 'Volume size for the EC2 instance in GB.'
+    description: 'Volume size for the EC2 instance in GB. Default: 20'
     required: true
+    default: '20'
   aws_ec2_additional_tags:
     description: 'Additional tags for the EC2 instance.'
     required: false
