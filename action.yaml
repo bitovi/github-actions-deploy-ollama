@@ -67,6 +67,11 @@ inputs:
     required: false
     default: 'false'
 
+  docker_cloudwatch_skip_destroy:
+    description: 'Set to true to skip destroying the CloudWatch log group on deletion.'
+    required: false
+    default: 'false'
+
   # app specific config
   disable-signup:
     description: 'Disable user signup for the application.'
@@ -248,7 +253,7 @@ runs:
         # Docker
         docker_install: true
         docker_cloudwatch_enable: true
-        docker_cloudwatch_skip_destroy: true
+        docker_cloudwatch_skip_destroy: ${{ inputs.docker_cloudwatch_skip_destroy }}
         docker_repo_app_directory: 'gha-deployment'
 
         # EC2
