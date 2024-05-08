@@ -8,6 +8,9 @@ services:
       - 3011:8080
     volumes:
       - ./open-webui:/app/backend/data
+    env_file:
+      - .env
+      - auto.gha.app.env
     environment:
       # - "ENABLE_SIGNUP=false"
       - "OLLAMA_BASE_URL=http://ollama:11434"

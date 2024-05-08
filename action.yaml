@@ -68,6 +68,11 @@ inputs:
     default: 'false'
 
   # app specific config
+  disable-signup:
+    description: 'Disable user signup for the application.'
+    required: false
+    default: 'false'
+
   # app_volume_ui:
   #   description: 'Volume mapping for the UI service.'
   #   required: false
@@ -194,6 +199,33 @@ runs:
 
         echo "removing operations dir"
         rm -rf $app_path/operations
+
+    # if inputs.disable-signup == 'true, then remove the signup page
+    # env var: ENABLE_SIGNUP=false
+    - name: Set app env config
+      id: set-app-env-config
+      shell: bash
+      env:
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
+        APP_SUBDIR: gha-deployment
+        DISABLE_SIGNUP: ${{ inputs.disable-signup }}
+      run: |
+        app_path=$GITHUB_WORKSPACE/$APP_SUBDIR
+        filename="auto.gha.app.env"
+
+
+
+        echo "::group::Set up GHA generated app config"
+
+        echo "checking if disable-signup is set"
+        if [ "$DISABLE_SIGNUP" == "true" ]; then
+          echo "Disabling signup"
+          echo "ENABLE_SIGNUP=false" >> $app_path/$filename
+        fi
+
+        echo ""
+        echo "::endgroup::"
+      
 
     - name: Deploy with Bitovi Commons
       id: deploy
