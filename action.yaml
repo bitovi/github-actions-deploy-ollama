@@ -222,10 +222,13 @@ runs:
 
         echo "::group::Set up GHA generated app config"
 
-        echo "checking if disable-signup is set"
+        echo "checking if disable-signup is set ($DISABLE_SIGNUP)"
         if [ "$DISABLE_SIGNUP" == "true" ]; then
           echo "Disabling signup"
           echo "ENABLE_SIGNUP=false" >> $app_path/$filename
+        else
+          echo "Enabling signup"
+          echo "ENABLE_SIGNUP=true" >> $app_path/$filename
         fi
 
         echo ""
