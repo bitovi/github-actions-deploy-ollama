@@ -122,7 +122,7 @@ The following inputs can be used as `step.with` keys
 #### **EC2 Inputs**
 | Name             | Type    | Description                        |
 |------------------|---------|------------------------------------|
-| `aws_ec2_instance_type` | String | The AWS EC2 instance type. Default is `t2.medium`. |
+| `aws_ec2_instance_type` | String | The AWS EC2 instance type. Default is `inf1.xlarge`. |
 | `aws_ec2_instance_profile` | String | The AWS IAM instance profile to use for the EC2 instance. Use if you want to pass an AWS role with specific permissions granted to the instance. |
 | `aws_ec2_create_keypair_sm` | Boolean | Creates a Secret in AWS secret manager to store a kypair. Default is `false`. |
 | `aws_ec2_instance_vol_size` | String | Root disk size for the EC2 instance. Default is `10`. |
