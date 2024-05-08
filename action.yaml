@@ -265,12 +265,12 @@ runs:
         aws_ec2_create_keypair_sm: ${{ inputs.aws_ec2_create_keypair_sm }}
         aws_ec2_instance_root_vol_size: ${{ inputs.aws_ec2_instance_vol_size }}
         aws_ec2_additional_tags: ${{ inputs.aws_ec2_additional_tags }}
-        aws_ec2_port_list: "3011,11434"
+        # aws_ec2_port_list: "3011,11434"
         
         # AWS ELB
         aws_elb_create: true
-        aws_elb_listen_port: "443,3011"
-        aws_elb_app_port: "8080,11434"
+        aws_elb_listen_port: "3011,11434"
+        aws_elb_app_port: "3011,11434"
         aws_elb_healthcheck: "TCP:11434"
 
         # Stack management
