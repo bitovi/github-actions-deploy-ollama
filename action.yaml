@@ -67,7 +67,17 @@ inputs:
     required: false
     default: 'false'
 
+  docker_cloudwatch_skip_destroy:
+    description: 'Set to true to skip destroying the CloudWatch log group on deletion.'
+    required: false
+    default: 'false'
+
   # app specific config
+  disable-signup:
+    description: 'Disable user signup for the application.'
+    required: false
+    default: 'false'
+
   # app_volume_ui:
   #   description: 'Volume mapping for the UI service.'
   #   required: false
@@ -195,6 +205,36 @@ runs:
         echo "removing operations dir"
         rm -rf $app_path/operations
 
+    # if inputs.disable-signup == 'true, then remove the signup page
+    # env var: ENABLE_SIGNUP=false
+    - name: Set app env config
+      id: set-app-env-config
+      shell: bash
+      env:
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
+        APP_SUBDIR: gha-deployment
+        DISABLE_SIGNUP: ${{ inputs.disable-signup }}
+      run: |
+        app_path=$GITHUB_WORKSPACE/$APP_SUBDIR
+        filename="auto.gha.app.env"
+
+
+
+        echo "::group::Set up GHA generated app config"
+
+        echo "checking if disable-signup is set ($DISABLE_SIGNUP)"
+        if [ "$DISABLE_SIGNUP" == "true" ]; then
+          echo "Disabling signup"
+          echo "ENABLE_SIGNUP=false" >> $app_path/$filename
+        else
+          echo "Enabling signup"
+          echo "ENABLE_SIGNUP=true" >> $app_path/$filename
+        fi
+
+        echo ""
+        echo "::endgroup::"
+      
+
     - name: Deploy with Bitovi Commons
       id: deploy
       uses: bitovi/github-actions-commons@v0.0.13
@@ -216,7 +256,7 @@ runs:
         # Docker
         docker_install: true
         docker_cloudwatch_enable: true
-        docker_cloudwatch_skip_destroy: true
+        docker_cloudwatch_skip_destroy: ${{ inputs.docker_cloudwatch_skip_destroy }}
         docker_repo_app_directory: 'gha-deployment'
 
         # EC2
@@ -228,12 +268,12 @@ runs:
         aws_ec2_create_keypair_sm: ${{ inputs.aws_ec2_create_keypair_sm }}
         aws_ec2_instance_root_vol_size: ${{ inputs.aws_ec2_instance_vol_size }}
         aws_ec2_additional_tags: ${{ inputs.aws_ec2_additional_tags }}
-        aws_ec2_port_list: "3011,11434"
+        # aws_ec2_port_list: "3011,11434"
         
         # AWS ELB
         aws_elb_create: true
-        aws_elb_listen_port: "443,3011"
-        aws_elb_app_port: "8080,11434"
+        aws_elb_listen_port: "3011,11434"
+        aws_elb_app_port: "3011,11434"
         aws_elb_healthcheck: "TCP:11434"
 
         # Stack management
