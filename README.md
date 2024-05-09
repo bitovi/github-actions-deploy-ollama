@@ -1,6 +1,8 @@
 # Deploy Ollama and Open WebUI with GitHub Actions 🌐🚀
 
-Welcome to the easiest way to get your own hosted private language model running swiftly with Ollama, complemented by Open WebUI, the slick front-end that makes interaction smooth and straightforward. 
+Welcome to the easiest way to get your own hosted private language model running swiftly with [Ollama](https://github.com/ollama/ollama) and [Open WebUI](https://github.com/open-webui/open-webui)
+
+![alt text](screenshot.png)
 
 
 ## Why use this action?
