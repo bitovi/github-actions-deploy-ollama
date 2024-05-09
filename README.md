@@ -7,7 +7,9 @@ Welcome to the easiest way to get your own hosted private language model running
 
 ## Why use this action?
 
-With this action, you can easily get up and running with hosted inference.  We've made it simple to deploy your own LLM and interact with it via the Open WebUI or the API.  This action is perfect for anyone who wants to try out the latest models, ask questions about documents, or even build Retrieval Augmented Generation (RAG) apps against an LLM you own!
+With this action, you can easily have your very own Large Language Model (LLM) like OpenAI's GPTChat or Anthropic's Claude.  Except that it's entirely yours!  You can tune it with your own data, and it's hosted on your own AWS account.
+
+This action is perfect for anyone who wants to try out the latest models, ask questions about documents, or even build Retrieval Augmented Generation (RAG) apps against an LLM you own!
 
 🖥️✨ Get started below, and you'll be talking with your own hosted LLM in no time!
 
