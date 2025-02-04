@@ -14,14 +14,20 @@ services:
     environment:
       # - "ENABLE_SIGNUP=false"
       - "OLLAMA_BASE_URL=http://ollama:11434"
-
+    depends_on:
+      - ollama
 
   # ollama which shoul dhave a start command of `ollama run llama3:8b`
   ollama:
     image: ollama/ollama
+    container_name: ollama
     restart: always
     ports:
       - 11434:11434
+    env_file:
+      - .env
+      - auto.gha.app.env
     volumes:
       - ./ollama:/root/.ollama
-    # entrypoint: ollama run llama3:8b
+      - ./ollama-entrypoint.sh:/ollama-entrypoint.sh  # Mount script inside container
+    entrypoint: ["/bin/sh", "/ollama-entrypoint.sh"]  # Use custom entrypoint
