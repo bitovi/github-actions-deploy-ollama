@@ -1,6 +1,9 @@
 name: 'Deploy Ollama and Open WebUI'
 description: 'Deploy your own LLM (large language model) like llama3 with a web based UI to an EC2 instance.'
-
+branding:
+  icon: upload-cloud
+  color: red
+  
 inputs:
   # App specific config
   disable_signup:
