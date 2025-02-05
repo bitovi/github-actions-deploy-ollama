@@ -3,11 +3,11 @@ description: 'Deploy your own LLM (large language model) like llama3 with a web 
 
 inputs:
   # App specific config
-  disable-signup:
+  disable_signup:
     description: 'Disable user signup for the application.'
     required: false
     default: 'false'
-  ollama-models:
+  ollama_models:
     description: 'Comma separated list of models to download automatically.'
     required: false
     default: ''
@@ -262,7 +262,7 @@ runs:
         echo "removing operations dir"
         rm -rf $app_path/operations
 
-    # if inputs.disable-signup == 'true, then remove the signup page
+    # if inputs.disable_signup == 'true, then remove the signup page
     # env var: ENABLE_SIGNUP=false
     - name: Set app env config
       id: set-app-env-config
@@ -270,15 +270,15 @@ runs:
       env:
         GITHUB_ACTION_PATH: ${{ github.action_path }}
         APP_SUBDIR: gha-deployment
-        DISABLE_SIGNUP: ${{ inputs.disable-signup }}
-        OLLAMA_MODELS: ${{ inputs.ollama-models }} 
+        DISABLE_SIGNUP: ${{ inputs.disable_signup }}
+        OLLAMA_MODELS: ${{ inputs.ollama_models }} 
       run: |
         app_path=$GITHUB_WORKSPACE/$APP_SUBDIR
         filename="auto.gha.app.env"
 
         echo "::group::Set up GHA generated app config"
 
-        echo "checking if disable-signup is set ($DISABLE_SIGNUP)"
+        echo "checking if disable_signup is set ($DISABLE_SIGNUP)"
         if [ "$DISABLE_SIGNUP" == "true" ]; then
           echo "Disabling signup"
           echo "ENABLE_SIGNUP=false" >> $app_path/$filename
@@ -287,7 +287,7 @@ runs:
           echo "ENABLE_SIGNUP=true" >> $app_path/$filename
         fi
         
-        echo "checking if ollama-models is not empty and has more than one character."
+        echo "checking if ollama_models is not empty and has more than one character."
         if [[ -n "$OLLAMA_MODELS" && ${#OLLAMA_MODELS} -gt 1 ]]; then
           echo "MODELS=$OLLAMA_MODELS" >> $app_path/$filename
         fi

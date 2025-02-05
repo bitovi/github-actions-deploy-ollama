@@ -73,6 +73,7 @@ jobs:
 
 
 ### Advanced example
+```yaml
 name: Advanced deploy
 on:
   push:
