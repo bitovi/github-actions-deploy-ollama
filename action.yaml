@@ -277,7 +277,7 @@ runs:
         filename="auto.gha.app.env"
 
         echo "::group::Set up GHA generated app config"
-
+        touch $app_path/$filename
         echo "checking if disable_signup is set ($DISABLE_SIGNUP)"
         if [ "$DISABLE_SIGNUP" == "true" ]; then
           echo "Disabling signup"
