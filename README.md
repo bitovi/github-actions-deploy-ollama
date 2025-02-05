@@ -63,7 +63,7 @@ jobs:
     steps:
     - id: deploy
       name: Deploy
-      uses: bitovi/github-actions-deploy-ollama@v1
+      uses: bitovi/github-actions-deploy-ollama@v0
       with:
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID}}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
@@ -85,7 +85,7 @@ jobs:
     steps:
     - id: deploy
       name: Deploy
-      uses: bitovi/github-actions-deploy-ollama@v1
+      uses: bitovi/github-actions-deploy-ollama@v0
       with:
         disable_signup: true
         ollama_models: "phi3,qwen:0.5b,tinyllama"
