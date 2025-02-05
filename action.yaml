@@ -192,6 +192,10 @@ inputs:
     required: false
 
   # Docker 
+  docker_install: 
+    description: 'Define if docker should be installed. After this, docker-compose up will be excecuted.'
+    required: false
+    default: true
   docker_remove_orphans:
     description: 'Toggle --remove-orphans flag. Defaults to false.'
     required: false
@@ -358,6 +362,7 @@ runs:
         aws_r53_additional_tags: ${{ inputs.aws_r53_additional_tags }}
 
         # Docker
+        docker_install: ${{ inputs.docker_install }}
         docker_remove_orphans: ${{ inputs.docker_remove_orphans }}
         docker_full_cleanup: ${{ inputs.docker_full_cleanup }}
         docker_repo_app_directory: 'gha-deployment'
