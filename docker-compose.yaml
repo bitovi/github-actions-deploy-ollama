@@ -17,7 +17,8 @@ services:
     depends_on:
       - ollama
 
-  # ollama which shoul dhave a start command of `ollama run llama3:8b`
+  # ollama which should have a start command of `ollama run llama3:8b`
+```‏
   ollama:
     image: ollama/ollama
     container_name: ollama
