@@ -173,6 +173,7 @@ The following inputs can be used as `step.with` keys
 #### **EC2 Inputs**
 | Name             | Type    | Description                        |
 |------------------|---------|------------------------------------|
+| `aws_ec2_instance_create` | Boolean | Toggles the creation of an EC2 instance. (Default is `true`). |
 | `aws_ec2_ami_filter` | String | AWS AMI Filter string. Will be used to lookup for lates image based on the string. Defaults to `ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*`.' |
 | `aws_ec2_ami_owner` | String | Owner of AWS AMI image. This ensures the provider is the one we are looking for. Defaults to `099720109477`, Canonical (Ubuntu). |
 | `aws_ec2_ami_id` | String | AWS AMI ID. Will default to the latest Ubuntu 22.04 server image (HVM). Accepts `ami-###` values. |

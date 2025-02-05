@@ -77,6 +77,10 @@ inputs:
     required: false
 
   # EC2 Instance config
+  aws_ec2_instance_create:
+    description: 'Define if an EC2 instance should be created'
+    required: false
+    default: true
   aws_ec2_ami_filter:
     description: 'AWS AMI Filter string. Will be used to lookup for lates image based on the string. Defaults to `ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*`.'
     required: false
@@ -310,6 +314,7 @@ runs:
         env_ghv: ${{ inputs.env_ghv }}
 
         # EC2
+        aws_ec2_instance_create: ${{ inputs.aws_ec2_instance_create }}
         aws_ec2_ami_filter: ${{ inputs.aws_ec2_ami_filter }}
         aws_ec2_ami_owner: ${{ inputs.aws_ec2_ami_owner }}
         aws_ec2_ami_id: ${{ inputs.aws_ec2_ami_id || inputs.aws_ami_id }}
