@@ -63,7 +63,6 @@ inputs:
   ansible_start_docker_timeout:
     description: 'Ammount of time in seconds it takes Ansible to mark as failed the startup of docker. Defaults to `300`'
     required: false
-    default: 6000
 
   # ENV files
   env_aws_secret:
